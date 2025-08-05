@@ -13,8 +13,10 @@ limited_apps = {
 }
 limited_websites = {"www.youtube.com": "YouTube"}
 
-APP_LIMITS = 2  # mins
-WEB_LIMITS = 2  # mins
+APP_LIMITS = 45  # mins
+WEB_LIMITS = 60  # mins
+
+LOOP_SLEEP = 5 * 60  # seconds
 
 
 def get_open_tabs():
@@ -127,7 +129,7 @@ class Detector:
 
     def loop(self):
         while True:
-            time.sleep(8)
+            time.sleep(LOOP_SLEEP)
 
             app_data = self.check_limited_apps()
             web_data = self.check_limited_websites()
