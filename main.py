@@ -2,6 +2,8 @@ import psutil
 import datetime
 import time
 import requests
+import signal
+import sys
 
 from lib.winnotif import WindowsNotifier
 from lib.pushover import PushOver
@@ -41,7 +43,12 @@ class Detector:
         self.appmemory = {}  # exe -> datetime
         self.sentbook = set()  # label -> notified
         self.winnotif = WindowsNotifier()
+        self.winnotif.send_notification("Anti-procrastinator", "App is active")
         self.pushnotify = PushOver()
+        
+        # Register shutdown handler
+        signal.signal(signal.SIGINT, self.shutdown_handler)
+        signal.signal(signal.SIGTERM, self.shutdown_handler)
 
         self.loop()
 
@@ -151,6 +158,14 @@ class Detector:
                     self.notify(f"Time limit reached for web app: {webapp['label']}")
                     print("User notified of time limit breach")
                     self.sentbook.add(webapp["label"])
+
+    def shutdown_handler(self, signum, frame):
+        """Handle shutdown signals and send win notification"""
+        self.winnotif.send_notification(
+            "Anti-procrastinator", "App has stopped successfully"
+        )
+        print("App has stopped successfully")
+        sys.exit(0)
 
 
 if __name__ == "__main__":
